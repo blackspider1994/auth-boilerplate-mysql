@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
 
-app.use(webRoutes);
+app.use('/api',webRoutes);
 app.use(errorController.pageNotFound);
 app.use(
 	jwt({

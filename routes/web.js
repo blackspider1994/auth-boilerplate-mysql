@@ -3,6 +3,9 @@ const router = express.Router();
 const HomeController = require('../app/controllers/HomeController');
 const AuthController = require('../app/controllers/AuthController');
 
+router.get('/ping', (req,res)=>{
+    res.status(200).send("Server is accessable !!")
+});
 router.get('/', HomeController.homePage);
 // router.get('/login', AuthController.loginPage);
 router.post('/login', AuthController.login);
