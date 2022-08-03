@@ -4,29 +4,8 @@ var jwt = require('jsonwebtoken');
 // const nodemailer = require("nodemailer");
 const validator = require('validator');
 const User = require('../models/User');
-const Session = require('../models/Session');
 const sendMail = require('../../helpers/nodeMailer')
-const message = (req) => {
-	let message = req.flash('error');
-	if (message.length > 0) {
-		message = message[0];
-	} else {
-		message = null;
-	}
 
-	return message;
-}
-
-const oldInput = (req) => {
-	let oldInput = req.flash('oldInput');
-	if (oldInput.length > 0) {
-		oldInput = oldInput[0];
-	} else {
-		oldInput = null;
-	}
-
-	return oldInput;
-}
 exports.login = (req, res, next) => {
 	try {
 		const validationErrors = [];
@@ -62,8 +41,9 @@ exports.login = (req, res, next) => {
 							const refreshToken = await jwt.sign({
 								data: { userId: user.dataValues.id }
 							}, process.env.JWT_REFRESH_TOKEN_KEY, { expiresIn: '7d' });
+							const { fullName, id, email } = user.dataValues;
 
-							return res.status(200).send({ status: true, message: 'Login successfull.', token, refreshToken });
+							return res.status(200).send({ status: true, message: 'Login successfull.', token, refreshToken, user: { fullName, id, email } });
 						}
 						else {
 							return res.status(200).send({ status: false, message: 'Email or Password is incorrect.' });
@@ -116,7 +96,7 @@ exports.signUp = (req, res, next) => {
 					}, process.env.JWT_VERIFY_TOKEN, { expiresIn: `${process.env.VERIFY_TOKEN_EXPIRY}` });
 
 					const user = new User({
-						fullName: req.body.name,
+						fullName: req.body.fullName,
 						email: req.body.email,
 						password: hashedPassword,
 						verificationToken: token
@@ -187,7 +167,7 @@ exports.accountVerify = async (req, res, next) => {
 
 exports.forgotPassword = async (req, res, next) => {
 	const validationErrors = [];
-	console.log("email",req.body.email )
+	console.log("email", req.body.email)
 	try {
 		if (!validator.isEmail(req?.body?.email)) validationErrors.push('Please enter a valid email address.');
 
@@ -225,7 +205,7 @@ exports.forgotPassword = async (req, res, next) => {
 				);
 				res.status(200).send({ message: "A link has been sent to your registered email. ", status: !!user, testURI: emailResponse.testURI })
 
-			}else{
+			} else {
 				res.status(200).send({ message: "A link has been sent to your registered email. ", status: !!user })
 
 			}
@@ -244,7 +224,7 @@ exports.forgotPassword = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
 	try {
-		const { verificationToken,password } = req.body;
+		const { verificationToken, password } = req.body;
 		var decoded = await jwt.verify(verificationToken, process.env.JWT_RESET_TOKEN);
 		User.findOne({
 			where: {
@@ -252,31 +232,57 @@ exports.resetPassword = async (req, res, next) => {
 			}
 		}).then(async user => {
 			if (user && user.resetToken === verificationToken) {
-					return bcrypt
-				.hash(password, 12)
-				.then(async hashedPassword => {
-			
-				let result = await user.update({ password: hashedPassword, resetToken: null,resetTokenExpiry:null })
-				if (result) {
-					res.status(200).send({ message:"Password updated",status:true })
+				return bcrypt
+					.hash(password, 12)
+					.then(async hashedPassword => {
+
+						let result = await user.update({ password: hashedPassword, resetToken: null, resetTokenExpiry: null })
+						if (result) {
+							res.status(200).send({ message: "Password updated", status: true })
 
 
-				} else {
-					res.status(200).send({ message:"Err updating password try again",status:false })
+						} else {
+							res.status(200).send({ message: "Err updating password try again", status: false })
 
-				}
-		
-			})
+						}
+
+					})
 			} else {
 				// res.redirect(process.env.VERIFY_RETURN_URL_FAIL)
 
-				res.status(200).send({ message:"Invalid token",status:false })
+				res.status(200).send({ message: "Invalid token", status: false })
 
 			}
 		}).catch(err => {
 			console.log(err)
 		});
 
+	}
+	catch (err) {
+		console.log(err)
+		return res.status(500).send({ status: false, message: "Something went wrong", err });
+
+	}
+};
+exports.getUser = async (req, res, next) => {
+	try {
+		console.log(req.auth)
+		const userId=req?.auth?.data?.userId;
+		User.findOne({
+			where: {
+				id: userId
+			}
+		}).then(async user => {
+	
+				// res.redirect(process.env.VERIFY_RETURN_URL_FAIL)
+				const { fullName, id, email } = user;
+
+				res.status(200).send({status: true,user:{ fullName, id, email } })
+
+			
+		}).catch(err => {
+			console.log(err)
+		});
 	}
 	catch (err) {
 		console.log(err)
