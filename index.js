@@ -17,15 +17,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
-
-app.use('/api',webRoutes);
-app.use(errorController.pageNotFound);
 app.use(
 	jwt({
 	  secret: process.env.JWT_TOKEN_KEY,
 	  algorithms: ["HS256"],
-	}).unless({ path: ["/sign-up","/login"] })
-  );
+	}).unless({ path: ["/api/sign-up","/api/login","/api/reset-password","/api/forget-password","/api/verify","/api/test"] })
+	);
+app.use('/api',webRoutes);
+
 sequelize
 	// .sync({force : true})
 	.sync({ alter: true  })
