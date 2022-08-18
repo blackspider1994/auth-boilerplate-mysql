@@ -35,6 +35,8 @@ const User = sequelize.define('users', {
 			type: DataTypes.DATE,
 			allowNull:true
 		}
+		
+
   	},
 	{
 		indexes: [

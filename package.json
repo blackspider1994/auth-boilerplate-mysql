@@ -10,7 +10,8 @@
   "author": "Mangesh Ghadigaonkar",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "sequelize-cli": "^6.4.1"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

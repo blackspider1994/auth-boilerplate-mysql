@@ -10,6 +10,7 @@ const app = express();
 //Loading Routes
 const webRoutes = require('./routes/web');
 const sequelize = require('./config/database');
+const migrate = require('./app/models/migrate');
 const errorController = require('./app/controllers/ErrorController');
 
 env.config();
