@@ -1,28 +1,40 @@
-const {  Model } = require('sequelize');
-module.exports = function(sequelize,DataTypes){
-class Role extends Model {}
+'use strict';
+const {
+	Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+	class Role extends Model {
+		/**
+		 * Helper method for defining associations.
+		 * This method is not a part of Sequelize lifecycle.
+		 * The `models/index` file will call this method automatically.
+		 */
+		static associate(models) {
+			// define association here
 
-const RoleModal= Role.init({
-	id: {
-		type: DataTypes.INTEGER,
-		autoIncrement: true,
-		allowNull: false,
-		primaryKey: true
-	},
-	name: DataTypes.STRING,
-	
-	policy: {
-		type: DataTypes.JSON,
-		allowNull:true
+			const { User, Role } = models;
+			Role.hasMany(User, { foreignKey: 'role_id' });
+			User.belongsTo(Role, { foreignKey: 'role_id' });
+		}
+		
 	}
-	
-}, {
-  // Other model options go here
-  sequelize, // We need to pass the connection instance
-  modelName: 'Role' // We need to choose the model name
-});
+	Role.init({
+		id: {
+			type: DataTypes.INTEGER,
+			autoIncrement: true,
+			allowNull: false,
+			primaryKey: true
+		},
+		name: DataTypes.STRING,
 
-// the defined model is the class itself
-console.log("Role Modal created ",Role === sequelize.models.Role); // true
-return RoleModal;
-}
+		policy: {
+			type: DataTypes.JSON,
+			allowNull: true
+		}
+
+	}, {
+		sequelize,
+		modelName: 'Role',
+	});
+	return Role;
+};

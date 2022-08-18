@@ -26,22 +26,23 @@ fs
     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
     db[model.name] = model;
   });
-  console.log(__dirname+'/relations/')
-  fs
-  .readdirSync(__dirname+'/relations/')
-  .filter(file => {
-    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
-  })
-  .forEach(file => {
-     require(path.join(__dirname+'/relations/', file))(sequelize);
+
+  //define relations from relations folder
+  // fs
+  // .readdirSync(__dirname+'/relations/')
+  // .filter(file => {
+  //   return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+  // })
+  // .forEach(file => {
+  //    require(path.join(__dirname+'/relations/', file))(sequelize);
     
-  });
-// Object.keys(db).forEach(modelName => {
-//   console.log("db[modelName]",db[modelName].associate)
-//   if (db[modelName].associate) {
-//     db[modelName].associate(db);
-//   }
-// });
+  // });
+
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

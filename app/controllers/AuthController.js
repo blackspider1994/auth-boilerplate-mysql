@@ -8,7 +8,7 @@ const sendMail = require('../../helpers/nodeMailer')
 
 exports.login = (req, res, next) => {
 	try {
-		const {User}=req.db.models;
+		const { User } = req.db.models;
 		const validationErrors = [];
 		if (!validator.isEmail(req.body.email)) validationErrors.push('Please enter a valid email address.');
 		if (validator.isEmpty(req.body.password)) validationErrors.push('Password cannot be blank.');
@@ -83,7 +83,7 @@ exports.logout = (req, res, next) => {
 };
 
 exports.signUp = (req, res, next) => {
-	const {User}=req.db.models;
+	const { User } = req.db.models;
 
 	User.findOne({
 		where: {
@@ -113,7 +113,7 @@ exports.signUp = (req, res, next) => {
 							to: req.body.email, // list of receivers
 							subject: "Verify Email", // Subject line
 							text: "reset email", // plain text body
-							html: `<b>Verify email at <a href=${process.env.VERIFY_URL}/api/verify?verificationToken=${result.verificationToken}>Click Here to verify Email</a></b>`, // html body
+							html: `<b>Verify email at <a href=${process.env.VERIFY_URL}/verify?verificationToken=${result.verificationToken}>Click Here to verify Email</a></b>`, // html body
 						}
 
 					)
@@ -133,7 +133,7 @@ exports.signUp = (req, res, next) => {
 
 exports.accountVerify = async (req, res, next) => {
 	try {
-		const {User}=req.db.models;
+		const { User } = req.db.models;
 
 		const { verificationToken } = req.query;
 		var decoded = await jwt.verify(verificationToken, process.env.JWT_VERIFY_TOKEN);
@@ -171,7 +171,7 @@ exports.accountVerify = async (req, res, next) => {
 };
 
 exports.forgotPassword = async (req, res, next) => {
-	const {User}=req.db.models;
+	const { User } = req.db.models;
 
 	const validationErrors = [];
 	console.log("email", req.body.email)
@@ -206,7 +206,7 @@ exports.forgotPassword = async (req, res, next) => {
 						to: req.body.email, // list of receivers
 						subject: "Reset password Email", // Subject line
 						text: "reset email", // plain text body
-						html: `<b>Verify email at <a href=${process.env.VERIFY_URL}/api/reset-password?verificationToken=${token}>Click Here to reset Password</a></b>`, // html body
+						html: `<b>Verify email at <a href=${process.env.VERIFY_URL}/reset-password?verificationToken=${token}>Click Here to reset Password</a></b>`, // html body
 					}
 
 				);
@@ -231,7 +231,7 @@ exports.forgotPassword = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
 	try {
-		const {User}=req.db.models;
+		const { User } = req.db.models;
 
 		const { verificationToken, password } = req.body;
 		var decoded = await jwt.verify(verificationToken, process.env.JWT_RESET_TOKEN);
@@ -275,22 +275,30 @@ exports.resetPassword = async (req, res, next) => {
 };
 exports.getUser = async (req, res, next) => {
 	try {
-		const {User}=req.db.models;
 
-		console.log(req.auth)
-		const userId=req?.auth?.data?.userId;
+		const { User,Role } = req.db.models;
+		const userId = req?.auth?.data?.userId;
 		User.findOne({
 			where: {
 				id: userId
-			}
+			},
+			include: [{
+				model: Role,
+				required: false,
+				
+			}],	
+
 		}).then(async user => {
-	
+			if (user) {
 				// res.redirect(process.env.VERIFY_RETURN_URL_FAIL)
 				const { fullName, id, email } = user;
 
-				res.status(200).send({status: true,user:{ fullName, id, email } })
+				res.status(200).send({ status: true, user: { fullName, id, email,role:user.Role } })
+			} else {
+				res.status(200).send({ status: false, user: null,message:"User not found" })
 
-			
+			}
+
 		}).catch(err => {
 			console.log(err)
 		});

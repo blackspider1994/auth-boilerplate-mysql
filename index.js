@@ -9,6 +9,8 @@ const app = express();
 
 //Loading Routes
 const webRoutes = require('./routes/web');
+const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
 const { sequelize } = require('./models/index');
 const errorController = require('./app/controllers/ErrorController');
 
@@ -21,13 +23,16 @@ app.use(
 	jwt({
 		secret: process.env.JWT_TOKEN_KEY,
 		algorithms: ["HS256"],
-	}).unless({ path: ["/api/sign-up", "/api/login", "/api/reset-password", "/api/forget-password", "/api/verify", "/api/test"] })
-);
+	}).unless({ path: ["/api/auth/sign-up", "/api/auth/login", "/api/auth/reset-password", "/api/auth/forget-password", "/api/auth/verify", "/api/test"] })
+	);
 app.use((req, res, next) => {
 	req.db = sequelize;
 	next();
 })
 app.use('/api', webRoutes);
+app.use('/api/auth', authRoutes);
+
+app.use('/api/admin', adminRoutes);
 
 sequelize
 	// .sync({ force: true })

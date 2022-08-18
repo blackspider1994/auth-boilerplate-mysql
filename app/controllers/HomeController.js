@@ -1,3 +1,3 @@
 exports.homePage = (req, res, next) => {
-	res.render('home');
+	res.status(200).send("Everything Okay !!")
 };
