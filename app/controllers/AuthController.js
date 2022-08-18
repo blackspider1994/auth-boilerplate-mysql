@@ -3,11 +3,12 @@ const bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 // const nodemailer = require("nodemailer");
 const validator = require('validator');
-const User = require('../models/User');
+
 const sendMail = require('../../helpers/nodeMailer')
 
 exports.login = (req, res, next) => {
 	try {
+		const {User}=req.db.models;
 		const validationErrors = [];
 		if (!validator.isEmail(req.body.email)) validationErrors.push('Please enter a valid email address.');
 		if (validator.isEmpty(req.body.password)) validationErrors.push('Password cannot be blank.');
@@ -82,6 +83,8 @@ exports.logout = (req, res, next) => {
 };
 
 exports.signUp = (req, res, next) => {
+	const {User}=req.db.models;
+
 	User.findOne({
 		where: {
 			email: req.body.email
@@ -130,6 +133,8 @@ exports.signUp = (req, res, next) => {
 
 exports.accountVerify = async (req, res, next) => {
 	try {
+		const {User}=req.db.models;
+
 		const { verificationToken } = req.query;
 		var decoded = await jwt.verify(verificationToken, process.env.JWT_VERIFY_TOKEN);
 		User.findOne({
@@ -166,6 +171,8 @@ exports.accountVerify = async (req, res, next) => {
 };
 
 exports.forgotPassword = async (req, res, next) => {
+	const {User}=req.db.models;
+
 	const validationErrors = [];
 	console.log("email", req.body.email)
 	try {
@@ -224,6 +231,8 @@ exports.forgotPassword = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
 	try {
+		const {User}=req.db.models;
+
 		const { verificationToken, password } = req.body;
 		var decoded = await jwt.verify(verificationToken, process.env.JWT_RESET_TOKEN);
 		User.findOne({
@@ -266,6 +275,8 @@ exports.resetPassword = async (req, res, next) => {
 };
 exports.getUser = async (req, res, next) => {
 	try {
+		const {User}=req.db.models;
+
 		console.log(req.auth)
 		const userId=req?.auth?.data?.userId;
 		User.findOne({
