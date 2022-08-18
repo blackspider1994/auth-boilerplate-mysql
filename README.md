@@ -17,6 +17,7 @@ A boilerplate for **Node.js** web applications. This boilerplate gives the basic
 5. Update the your database name and credentials in the `.env` file.
 6. Run the application with `npm start` (MySQL service should be up and running).
 7. Access `http://localhost:3000` and you're ready to go!
+8. Postman collection `https://www.getpostman.com/collections/e0cb5c94ffc6e188d8c5`
 
 ### Folder Structure
 ```
