@@ -1,0 +1,209 @@
+{
+	"info": {
+		"_postman_id": "4b3301ae-a787-4826-8225-2e7a6cb6db8e",
+		"name": "Auth BoilerPlate",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1578346",
+		"_collection_link": "https://martian-comet-417622.postman.co/workspace/Codistan~04049ebd-8650-44e8-b81e-bb13b7addf88/collection/1578346-4b3301ae-a787-4826-8225-2e7a6cb6db8e?action=share&creator=1578346&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Sign Up",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"usama.sama@gmail.com\",\r\n    \"fullName\":\"Usama zulfiqar\",\r\n    \"password\":\"redhat@123\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/sign-up",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"sign-up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign In",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"usama.sama@gmail.com\",\r\n    \"password\":\"redhat@123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "VerifyEmail",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/verify?verificationToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImVtYWlsIjoidXNhbWEuc2FtYUBnbWFpbC5jb20ifSwiaWF0IjoxNjU5MzU4ODg0LCJleHAiOjE2NTkzNTg5NDR9.ty0UhuFL10DHRgW1_oijGQOGwkl8Ej5YWjJC5yA6Axs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"verify"
+					],
+					"query": [
+						{
+							"key": "verificationToken",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImVtYWlsIjoidXNhbWEuc2FtYUBnbWFpbC5jb20ifSwiaWF0IjoxNjU5MzU4ODg0LCJleHAiOjE2NTkzNTg5NDR9.ty0UhuFL10DHRgW1_oijGQOGwkl8Ej5YWjJC5yA6Axs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ping Server",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/ping",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Forget Password Link",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"usama.sama@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/forgot-password",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"forgot-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reset Password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\":\"redhat@1234\",\r\n    \"confirmPassword\":\"redhat@1234\",\r\n    \"verificationToken\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImVtYWlsIjoidXNhbWEuc2FtYUBnbWFpbC5jb20ifSwiaWF0IjoxNjU5NDMxNjIzLCJleHAiOjE2NTk0MzI1MjN9.HCrgxXBbAri6-RKnWSBdfXVQUjW8SqQOaPnIKe1w0JQ\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/reset-password",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"reset-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUser",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{server-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/user",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"user"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
