@@ -14,10 +14,12 @@ exports.googlePlayWebhooks = async (req, res, next) => {
         console.log("req.body ", req.body)
         const data = req.body
         console.log("it got hit ", data.message.data)
+        // decoding buffer data from googple play
         const decodedData = JSON.parse(
             await new Buffer(data.message.data, "base64").toString("utf-8")
         );
         console.log("decodedData ", decodedData)
+        //Getting subscriptionObject if exists otherwise it would be oneTimeProductObject
         const subscriptionObject = decodedData.subscriptionNotification;
         const oneTimeProductObject = decodedData.OneTimeProductNotification;
         const packageName = decodedData.packageName;
@@ -572,10 +574,7 @@ exports.stripeWebhooks = async (req, res, next) => {
     }
 };
 exports.testFunction = async (req, res, next) => {
-    // Get the Stripe signature from the headers
-    const packageName = 'com.medpicc.dealdoc';
-    const subscriptionId = 'dealdoc1.1';
-    const purchaseToken = 'dbppaehpchpflbpjlghfccba.AO-J1OzKoqYr6RWAaLfD8mGLIs1DVBoc6oFjQvps0GwDjLtY8dEKPfyt3bmm6YHS3HUFhU9AthMUoNOJkxXfGDbC10Na_jr-_g';
+    const {purchaseToken,subscriptionId,packageName}=req.body;
     const getSubcriptionInformationResponse = await getSubcriptionInformation(purchaseToken,subscriptionId,packageName);
     console.log("getSubcriptionInformationResponse ",getSubcriptionInformationResponse)
     try {

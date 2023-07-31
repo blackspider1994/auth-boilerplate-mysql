@@ -5,6 +5,7 @@ const client = google.androidpublisher('v3');
 
 const SERVICE_ACCOUNT_EMAIL = "dealdocapp@gmail.com";
 const SERVICE_ACCOUNT_KEY_FILE = require("./googleplaycredentails.json");
+//Create googleplaycredentails.json file in helper functions
 const {CLIENT_EMAIL,PRIVATE_KEY}=process.env
 console.log("CLIENT_EMAIL,PRIVATE_KEY ",CLIENT_EMAIL,PRIVATE_KEY)
 const jwtClient = new google.auth.JWT(
