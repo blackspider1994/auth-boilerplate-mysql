@@ -6,6 +6,8 @@ const validator = require('validator');
 const json = require("json");
 const buffer = require("buffer");
 const User = require("../../models/User");
+const env = require('dotenv');
+env.config();
 const { getSubcriptionInformation } = require('../../helpers/getSubscriptionInformation');
 exports.googlePlayWebhooks = async (req, res, next) => {
     try {
@@ -564,6 +566,19 @@ exports.stripeWebhooks = async (req, res, next) => {
 
         // Return a successful response to Stripe
         res.sendStatus(200);
+    } catch (error) {
+        console.error('Error handling webhook:', error);
+        res.sendStatus(400);
+    }
+};
+exports.testFunction = async (req, res, next) => {
+    // Get the Stripe signature from the headers
+    const packageName = 'com.medpicc.dealdoc';
+    const subscriptionId = 'dealdoc1.1';
+    const purchaseToken = 'dbppaehpchpflbpjlghfccba.AO-J1OzKoqYr6RWAaLfD8mGLIs1DVBoc6oFjQvps0GwDjLtY8dEKPfyt3bmm6YHS3HUFhU9AthMUoNOJkxXfGDbC10Na_jr-_g';
+    const getSubcriptionInformationResponse = await getSubcriptionInformation(purchaseToken,subscriptionId,packageName);
+    console.log("getSubcriptionInformationResponse ",getSubcriptionInformationResponse)
+    try {
     } catch (error) {
         console.error('Error handling webhook:', error);
         res.sendStatus(400);

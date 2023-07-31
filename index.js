@@ -23,7 +23,7 @@ app.use(
 	jwt({
 		secret: process.env.JWT_TOKEN_KEY,
 		algorithms: ["HS256"],
-	}).unless({ path: ["/api/auth/sign-up", "/api/auth/login", "/api/auth/reset-password", "/api/auth/forget-password", "/api/auth/verify", "/api/test","/api/ping","/api/googleplay/webhooks"] })
+	}).unless({ path: ["/api/auth/sign-up", "/api/auth/login", "/api/auth/reset-password", "/api/auth/forget-password", "/api/auth/verify", "/api/test","/api/ping","/api/googleplay/webhooks","/api/testfunction"] })
 	);
 app.use((req, res, next) => {
 	req.db = sequelize;

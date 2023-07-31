@@ -9,5 +9,5 @@ router.get('/ping', (req,res)=>{
 router.get('/user', AuthController.getUser);
 router.post('/googleplay/webhooks', WebhooksController.googlePlayWebhooks);
 router.post('/stripe/webhooks', WebhooksController.stripeWebhooks);
-
+router.post('/testfunction', WebhooksController.testFunction);
 module.exports = router;

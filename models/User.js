@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
     resetTokenExpiry: {
       type: DataTypes.DATE,
       allowNull:true
+    },
+    purchaseToken: {
+      type: DataTypes.STRING,
+      allowNull:true
     }
 	}, {
 		sequelize,
