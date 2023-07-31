@@ -4,3 +4,5 @@ npm-debug.log
 yarn-error.log
 .env
 .DS_Store
+/helpers/googleplaycredentails.json
+.env

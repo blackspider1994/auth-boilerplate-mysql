@@ -6,6 +6,7 @@ const validator = require('validator');
 const json = require("json");
 const buffer = require("buffer");
 const User = require("../../models/User");
+const { getSubcriptionInformation } = require('../../helpers/getSubscriptionInformation');
 exports.googlePlayWebhooks = async (req, res, next) => {
     try {
         console.log("req.body ", req.body)
@@ -17,86 +18,248 @@ exports.googlePlayWebhooks = async (req, res, next) => {
         console.log("decodedData ", decodedData)
         const subscriptionObject = decodedData.subscriptionNotification;
         const oneTimeProductObject = decodedData.OneTimeProductNotification;
+        const packageName = decodedData.packageName;
         if (subscriptionObject) {
             console.log("subscriptionObject ", subscriptionObject)
             const purchaseToken = subscriptionObject.purchaseToken;
+            const subscriptionId = subscriptionObject.subscriptionId;
             const notificationType = subscriptionObject.notificationType;
             switch (notificationType) {
 
                 case 1://SUBSCRIPTION_RECOVERED
-
+                    const subscriptionInfo1 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo1 ", subscriptionInfo1)
+                    if (subscriptionInfo1?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: true,
+                            },
+                            {
+                                where: { id: subscriptionInfo1?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    } else {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: true,
+                            },
+                            {
+                                where: { purchaseToken: purchaseToken },
+                            }
+                        );
+                    }
                     break;
                 case 2://SUBSCRIPTION_RENEWED
-                    const userInfo2 = await User.findOne({
-                        where: {
-                            purchaseToken: purchaseToken
-                        },
-                    })
+                    const subscriptionInfo2 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo2 ", subscriptionInfo2)
                     //regive user access to platform
+                    if (subscriptionInfo2?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: true,
+                            },
+                            {
+                                where: { id: subscriptionInfo2?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    } else {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: true,
+                            },
+                            {
+                                where: { purchaseToken: purchaseToken },
+                            }
+                        );
+                    }
                     break;
                 case 3://SUBSCRIPTION_CANCELED
-                    let userInfo3 = await User.findOne({
-                        where: {
-                            purchaseToken: purchaseToken
-                        },
-                    })
+                    const subscriptionInfo3 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo3 ", subscriptionInfo3)
                     //revoke user access to platform
+                    if (subscriptionInfo3?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: false,
+                                notActiveSubscriptionReason: "You cancelled your membership"
+                            },
+                            {
+                                where: { id: subscriptionInfo3?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    } else {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: false,
+                                notActiveSubscriptionReason: "You cancelled your membership"
+                            },
+                            {
+                                where: { purchaseToken: purchaseToken },
+                            }
+                        );
+                    }
                     break;
                 case 4://SUBSCRIPTION_PURCHASED
-                    let userInfo4 = await User.findOne({
-                        where: {
-                            purchaseToken: purchaseToken
-                        },
-                    })
+
+                    const subscriptionInfo4 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo4 ", subscriptionInfo4)
+                    if (subscriptionInfo4?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                purchaseToken: purchaseToken
+                            },
+                            {
+                                where: { id: subscriptionInfo4?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    }
                     //attach purchase token to db
                     break;
                 case 5://SUBSCRIPTION_ON_HOLD
-                    let userInfo5 = await User.findOne({
-                        where: {
-                            purchaseToken: purchaseToken
-                        },
-                    })
+                    const subscriptionInfo5 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo5 ", subscriptionInfo5)
                     //revoke user access to platform
+                    if (subscriptionInfo5?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: false,
+                                notActiveSubscriptionReason: "You subscription is on hold"
+                            },
+                            {
+                                where: { id: subscriptionInfo5?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    } else {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: false,
+                                notActiveSubscriptionReason: "You subscription is on hold"
+                            },
+                            {
+                                where: { purchaseToken: purchaseToken },
+                            }
+                        );
+                    }
                     break;
                 case 6://SUBSCRIPTION_IN_GRACE_PERIOD
-
+                    const subscriptionInfo6 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo6 ", subscriptionInfo6)
                     break;
                 case 7://SUBSCRIPTION_RESTARTED 
-                    const userInfo7 = await User.findOne({
-                        where: {
-                            purchaseToken: purchaseToken
-                        },
-                    })
+                    const subscriptionInfo7 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo6 ", subscriptionInfo7)
                     //regive user access to platform
+                    if (subscriptionInfo7?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: true,
+                                notActiveSubscriptionReason: null
+                            },
+                            {
+                                where: { id: subscriptionInfo7?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    } else {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: true,
+                                notActiveSubscriptionReason: null
+                            },
+                            {
+                                where: { purchaseToken: purchaseToken },
+                            }
+                        );
+                    }
                     break;
                 case 8://SUBSCRIPTION_PRICE_CHANGE_CONFIRMED
-
+                    const subscriptionInfo8 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo8 ", subscriptionInfo8)
                     break;
                 case 9://SUBSCRIPTION_DEFERRED
+                    const subscriptionInfo9 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo9 ", subscriptionInfo9)
 
                     break;
                 case 10://SUBSCRIPTION_PAUSED
-                    let userInfo10 = await User.findOne({
-                        where: {
-                            purchaseToken: purchaseToken
-                        },
-                    })
+                    const subscriptionInfo10 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    console.log("subscriptionInfo10 ", subscriptionInfo10)
                     //revoke user access to platform
+                    if (subscriptionInfo10?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: true,
+                            },
+                            {
+                                where: { id: subscriptionInfo10?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    } else {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: true,
+                            },
+                            {
+                                where: { purchaseToken: purchaseToken },
+                            }
+                        );
+                    }
                     break;
                 case 11://SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED
 
                     break;
                 case 12://SUBSCRIPTION_REVOKED
-
+                    const subscriptionInfo12 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    if (subscriptionInfo12?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: false,
+                                notActiveSubscriptionReason: "Subscription has been revoked"
+                            },
+                            {
+                                where: { id: subscriptionInfo12?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    } else {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: false,
+                                notActiveSubscriptionReason: "Subscription has been revoked"
+                            },
+                            {
+                                where: { purchaseToken: purchaseToken },
+                            }
+                        );
+                    }
                     break;
                 case 13://SUBSCRIPTION_EXPIRED
-
+                    const subscriptionInfo13 = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName)
+                    if (subscriptionInfo13?.obfuscatedExternalAccountId) {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: false,
+                                notActiveSubscriptionReason: "Subscription has been expired"
+                            },
+                            {
+                                where: { id: subscriptionInfo13?.obfuscatedExternalAccountId },
+                            }
+                        );
+                    } else {
+                        const updatedUser = await User.update(
+                            {
+                                isActiveSubscription: false,
+                                notActiveSubscriptionReason: "Subscription has been expired"
+                            },
+                            {
+                                where: { purchaseToken: purchaseToken },
+                            }
+                        );
+                    }
                     break;
                 default:
                     console.log('Unhandled event type:', notificationType);
             }
             return res.status(200); //Sending ok response
-        }else if(oneTimeProductObject){
+        } else if (oneTimeProductObject) {
             console.log("oneTimeProductObject ", oneTimeProductObject)
             const purchaseToken = oneTimeProductObject.purchaseToken;
             const notificationType = oneTimeProductObject.notificationType;
@@ -152,9 +315,9 @@ exports.stripeWebhooks = async (req, res, next) => {
                 );
                 console.log("customer ", customer)
                 customerEmail = customer?.email?.toLowerCase();;
-                ifUser = await User.findOne({ email: customerEmail });
+                const ifUser = await User.findOne({ where: { email: customerEmail } });
                 priceId = customerSubscriptionCreated?.plan?.id
-                ifPlan = await Plan.findOne({ priceId: priceId })
+                const ifPlan = await Plan.findOne({ where: { priceId } });
                 if (ifUser) {
                     console.log("ifUser ", ifUser)
                     console.log("ifPlan ", ifPlan)
@@ -167,17 +330,14 @@ exports.stripeWebhooks = async (req, res, next) => {
                             customerSubscriptionCreated?.id
                         );
                     } else if (customerSubscriptionCreated.status == "active" && customerSubscriptionCreated.status == "trialing") {
-                        const updatedUser = await User.updateOne(
-                            { _id: ifUser._id },
+                        const updatedUser = await User.update(
                             {
-                                $set: {
-                                    planId: ifPlan?._id,
-                                    isPaid: true,
-                                    //shouldLoginAfter: dateAndTimeAfter48Hours,
-                                    subscriptionId: subscriptionId,
-                                    subscriptionStatus: subscriptionStatus
-                                }
-                            }, { new: true }
+                                planId: ifPlan?.id,
+                                isPaid: true,
+                                subscriptionId: subscriptionId,
+                                subscriptionStatus: subscriptionStatus,
+                            },
+                            { where: { id: ifUser?.id } }
                         );
                         console.log("updatedUser ", updatedUser)
                         await updateContactsSubscriptionStatus(customerEmail, subscriptionStatus)
@@ -201,50 +361,37 @@ exports.stripeWebhooks = async (req, res, next) => {
                 );
                 console.log("customer3 ", customer3)
                 customerEmail = customer3?.email?.toLowerCase();
-                ifUser = await User.findOne({ email: customerEmail });
+                ifUser = await User.findOne({ where: { email: customerEmail } });
                 console.log("ifUser ", ifUser)
                 const subscriptionId = customerSubscriptionUpdated?.id;
                 const subscriptionStatus = customerSubscriptionUpdated?.status;
                 console.log("subscriptionId, subscriptionStatus ", subscriptionId, subscriptionStatus)
                 priceId = customerSubscriptionUpdated?.plan?.id
-                ifPlan = await Plan.findOne({ priceId: priceId })
-                if (customerSubscriptionUpdated.status == 'past_due' && ifUser.subscriptionStatus == 'active' && customerSubscriptionUpdated.id == ifUser?.subscriptionId) {
-                    const toBeFreemiumEvent = await new toBeFreemium({
-                        userId: ifUser?._id,
-                        subscriptionId: customerSubscriptionUpdated?.id
-                    }).save()
-                    console.log("toBeFreemiumEvent ", toBeFreemiumEvent)
-                }
+                ifPlan = await Plan.findOne({ where: { priceId } });
                 if (customerSubscriptionUpdated.status == 'incomplete_expired' || customerSubscriptionUpdated.status == 'incomplete' || customerSubscriptionUpdated.status == 'cancelled') {
 
                 } else if (customerSubscriptionUpdated.status != "active" && customerSubscriptionUpdated.status != "trialing") {
-                    const updatedUser = await User.updateOne(
-                        { _id: ifUser._id },
+                    const updatedUser = await User.update(
                         {
-                            $set: {
-                                planId: ifPlan?._id,
-                                isPaid: true,
-                                //shouldLoginAfter: dateAndTimeAfter48Hours,
-                                subscriptionId: subscriptionId,
-                                subscriptionStatus: subscriptionStatus
-                            }
-                        }, { new: true }
+                            planId: ifPlan?.id,
+                            isPaid: true,
+                            subscriptionId: subscriptionId,
+                            subscriptionStatus: subscriptionStatus,
+                        },
+                        { where: { id: ifUser?.id } }
                     );
                     await updateContactsSubscriptionStatus(customerEmail, subscriptionStatus)
                     console.log("updatedUser ", updatedUser)
                 } else {
                     console.log("its activing and trailing ")
-                    const updatedUser = await User.updateOne(
-                        { _id: ifUser?._id },
+                    const updatedUser = await User.update(
                         {
-                            $set: {
-                                planId: ifPlan?._id,
-                                isPaid: true,
-                                //shouldLoginAfter: dateAndTimeAfter48Hours,
-                                subscriptionId: subscriptionId,
-                                subscriptionStatus: subscriptionStatus
-                            }
-                        }, { new: true }
+                            planId: ifPlan?.id,
+                            isPaid: true,
+                            subscriptionId: subscriptionId,
+                            subscriptionStatus: subscriptionStatus,
+                        },
+                        { where: { id: ifUser?.id } }
                     );
                     await updateContactsSubscriptionStatus(customerEmail, subscriptionStatus)
                     console.log("updatedUser ", updatedUser)
@@ -262,15 +409,16 @@ exports.stripeWebhooks = async (req, res, next) => {
                 ifUser = await User.findOne({ email: customerEmail });
                 console.log("ifUser ", ifUser)
                 if (ifUser?.subscriptionId == customerSubscriptionDeleted.id) {
-                    const updatedUser = await User.updateOne(
-                        { _id: ifUser?._id },
+                    const updatedUser = await User.update(
                         {
-                            $set: {
-                                isPaid: false,
-                                //shouldLoginAfter: dateAndTimeAfter48Hours,
-                                subscriptionStatus: "canceled"
-                            }
-                        }, { new: true }
+                            isPaid: false,
+                            //shouldLoginAfter: dateAndTimeAfter48Hours, // Assuming this property is commented out intentionally
+                            subscriptionStatus: "canceled"
+                        },
+                        {
+                            where: { id: ifUser.id },
+                            returning: true // This will make the update method return the updated row
+                        }
                     );
                     console.log("updatedUser ", updatedUser)
                     const deletedFreemiumEvent = await toBeFreemium.deleteOne({ subscriptionId: ifUser?.subscriptionId });
@@ -292,9 +440,9 @@ exports.stripeWebhooks = async (req, res, next) => {
                 );
                 console.log("customer2 ", customer2)
                 customerEmail = customer2.email;
-                ifUser = await User.findOne({ email: customerEmail });
+                ifUser = await User.findOne({ where: { email: customerEmail } });
                 priceId = subscriptionScheduleCreated?.items?.data[0]?.price?.id
-                ifPlan = await Plan.findOne({ priceId: priceId })
+                ifPlan = await Plan.findOne({ where: { priceId } });
                 if (ifUser) {
                     console.log("ifUser ", ifUser)
                     console.log("ifPlan ", ifPlan)
@@ -347,7 +495,7 @@ exports.stripeWebhooks = async (req, res, next) => {
                     SubPlan = "Yearly"
                 }
                 console.log("SubPlan ", SubPlan)
-                ifUser = await User.findOne({ email: customerEmail });
+                ifUser = await User.findOne({ where: { email: customerEmail } });
 
                 console.log("invoicePaymentSucceeded.status_transitions.paid_at ", invoicePaymentSucceeded.status_transitions.paid_at)
                 const monthNames = [
@@ -408,9 +556,6 @@ exports.stripeWebhooks = async (req, res, next) => {
                 const template = handlebars.compile(html);
                 const htmlToSend = template(replacements);
                 const emailResponse = await sendEmail(customerEmail, 1234, subject, htmlToSend)
-                if (ifUser?.subscriptionId == subscriptionInformation.id) {
-                    const deletedFreemiumEvent = await toBeFreemium.deleteOne({ subscriptionId: ifUser?.subscriptionId });
-                }
                 // Then define and call a function to handle the event subscription_schedule.updated
                 break;
             default:
