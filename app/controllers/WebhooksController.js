@@ -9,6 +9,7 @@ const User = require("../../models/User");
 const env = require('dotenv');
 env.config();
 const { getSubcriptionInformation } = require('../../helpers/getSubscriptionInformation');
+
 exports.googlePlayWebhooks = async (req, res, next) => {
     try {
         console.log("req.body ", req.body)
@@ -574,9 +575,9 @@ exports.stripeWebhooks = async (req, res, next) => {
     }
 };
 exports.testFunction = async (req, res, next) => {
-    const {purchaseToken,subscriptionId,packageName}=req.body;
-    const getSubcriptionInformationResponse = await getSubcriptionInformation(purchaseToken,subscriptionId,packageName);
-    console.log("getSubcriptionInformationResponse ",getSubcriptionInformationResponse)
+    const { purchaseToken, subscriptionId, packageName } = req.body;
+    const getSubcriptionInformationResponse = await getSubcriptionInformation(purchaseToken, subscriptionId, packageName);
+    console.log("getSubcriptionInformationResponse ", getSubcriptionInformationResponse)
     try {
     } catch (error) {
         console.error('Error handling webhook:', error);
