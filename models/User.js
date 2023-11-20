@@ -1,31 +1,31 @@
 
 'use strict';
 const {
-	Model
+  Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-	class User extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-      
-		}
-    static getUserWithRole(){
-			console.log("user with log called")
-		}
-		
-	}
-	User.init({
+  class User extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+
+    }
+    static getUserWithRole() {
+      console.log("user with log called")
+    }
+
+  }
+  User.init({
     fullName: DataTypes.STRING,
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true
-  
+
     },
     password: {
       type: DataTypes.STRING,
@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     isVerified: {
       type: DataTypes.BOOLEAN,
-      defaultValue:false,
+      defaultValue: false,
       allowNull: false
     },
     verificationToken: {
@@ -46,11 +46,23 @@ module.exports = (sequelize, DataTypes) => {
     },
     resetTokenExpiry: {
       type: DataTypes.DATE,
-      allowNull:true
+      allowNull: true
+    },
+    purchaseToken: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    isActiveSubscription: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    notActiveSubscriptionReason: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
-	}, {
-		sequelize,
-		modelName: 'User',
-	});
-	return User;
+  }, {
+    sequelize,
+    modelName: 'User',
+  });
+  return User;
 };
